@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ev Fiyatı Tahmini</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e8e8e8;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        .subtitle {
+            text-align: center;
+            color: #a0a0a0;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group:last-of-type {
+            margin-bottom: 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: #c0c0c0;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 1rem;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.25);
+        }
+        input::placeholder {
+            color: #666;
+        }
+        button {
+            width: 100%;
+            padding: 0.85rem;
+            margin-top: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4a9eff, #357abd);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(74, 158, 255, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            text-align: center;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .result.visible {
+            display: block;
+        }
+        .result.success {
+            background: rgba(46, 125, 50, 0.25);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            color: #81c784;
+        }
+        .result.error {
+            background: rgba(198, 40, 40, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.4);
+            color: #e57373;
+        }
+        .result .price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 0.35rem;
+        }
+        .hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ev Fiyatı Tahmini</h1>
+        <p class="subtitle">Özellikleri girerek tahmini fiyatı alın</p>
+
+        <div class="card">
+            <form id="predictForm">
+                <div class="form-group">
+                    <label for="square_footage">Alan (ft²)</label>
+                    <input type="number" id="square_footage" name="square_footage" min="1" placeholder="Örn: 1360" required>
+                    <span class="hint">1 m² ≈ 10,77 ft²</span>
+                </div>
+                <div class="form-group">
+                    <label for="bedrooms">Yatak Odası Sayısı</label>
+                    <input type="number" id="bedrooms" name="bedrooms" min="0" placeholder="Örn: 3" required>
+                </div>
+                <div class="form-group">
+                    <label for="bathrooms">Banyo Sayısı</label>
+                    <input type="number" id="bathrooms" name="bathrooms" min="0" placeholder="Örn: 2" required>
+                </div>
+                <div class="form-group">
+                    <label for="lot_size">Arsa Büyüklüğü (dönüm)</label>
+                    <input type="number" id="lot_size" name="lot_size" min="0" step="0.1" placeholder="Örn: 4,7 dönüm" required>
+                    <span class="hint">Birim: dönüm</span>
+                </div>
+                <div class="form-group">
+                    <label for="garage">Garaj Kapasitesi (Araç)</label>
+                    <input type="number" id="garage" name="garage" min="0" placeholder="Örn: 2" required>
+                </div>
+                <div class="form-group">
+                    <label for="neighborhood_score">Mahalle Puanı (1–10)</label>
+                    <input type="number" id="neighborhood_score" name="neighborhood_score" min="1" max="10" placeholder="Örn: 7" required>
+                </div>
+                <div class="form-group">
+                    <label for="house_age">Ev Yaşı (yıl)</label>
+                    <input type="number" id="house_age" name="house_age" min="0" placeholder="Örn: 10" required>
+                </div>
+                <button type="submit" id="submitBtn">Fiyat Tahmin Et</button>
+            </form>
+        </div>
+
+        <div class="card result" id="resultBox">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('predictForm');
+        const resultBox = document.getElementById('resultBox');
+        const resultContent = document.getElementById('resultContent');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function formatPrice(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 6
+            }).format(value);
+        }
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            resultBox.classList.remove('visible', 'success', 'error');
+
+            const payload = {
+                square_footage: parseInt(document.getElementById('square_footage').value, 10),
+                bedrooms: parseInt(document.getElementById('bedrooms').value, 10),
+                bathrooms: parseInt(document.getElementById('bathrooms').value, 10),
+                lot_size: parseFloat(document.getElementById('lot_size').value),
+                garage: parseInt(document.getElementById('garage').value, 10),
+                neighborhood_score: parseInt(document.getElementById('neighborhood_score').value, 10),
+                house_age: parseInt(document.getElementById('house_age').value, 10)
+            };
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Hesaplanıyor…';
+
+            try {
+                const res = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.detail ? JSON.stringify(data.detail) : 'İstek başarısız');
+                }
+
+                resultContent.innerHTML = 'Tahmini Fiyat<br><span class="price">' + formatPrice(data.prediction) + '</span>';
+                resultBox.classList.add('visible', 'success');
+            } catch (err) {
+                resultContent.textContent = 'Hata: ' + (err.message || 'Bağlantı hatası');
+                resultBox.classList.add('visible', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Fiyat Tahmin Et';
+            }
+        });
+    </script>
+</body>
+</html>
