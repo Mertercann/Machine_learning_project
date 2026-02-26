@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elmas Fiyat Tahmini</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at top, #2d3748 0, #1a202c 40%, #050816 100%);
+            color: #edf2f7;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .app-shell {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .card-glass {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(17, 24, 39, 0.96));
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.75),
+                0 0 0 1px rgba(15, 23, 42, 0.9);
+            padding: 28px 26px 26px;
+            backdrop-filter: blur(18px);
+        }
+
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .page-subtitle {
+            font-size: 0.98rem;
+            color: #a0aec0;
+            max-width: 640px;
+        }
+
+        .badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #a5b4fc;
+        }
+
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: radial-gradient(circle, #a5b4fc, #6366f1);
+            box-shadow: 0 0 10px rgba(129, 140, 248, 0.8);
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(148, 163, 184, 0.28);
+            margin: 10px 0 18px;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #9ca3af;
+            margin-bottom: 14px;
+        }
+
+        .helper-text {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .form-label {
+            color: #e5e7eb;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .form-label small {
+            font-weight: 400;
+            color: #9ca3af;
+            margin-left: 6px;
+            font-size: 0.78rem;
+        }
+
+        .form-control,
+        .form-select {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(55, 65, 81, 0.9);
+            color: #e5e7eb;
+            border-radius: 12px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.9rem;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, transform 0.05s ease;
+        }
+
+        .form-control::placeholder {
+            color: #6b7280;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(15, 23, 42, 1);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+            color: #f9fafb;
+            outline: none;
+        }
+
+        .form-control:disabled,
+        .form-select:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border: none;
+            color: #f9fafb;
+            padding: 0.7rem 1.9rem;
+            font-size: 0.92rem;
+            font-weight: 600;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow:
+                0 14px 25px rgba(55, 65, 81, 0.75),
+                0 0 0 1px rgba(79, 70, 229, 0.4);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            transform: translateY(-1px);
+            box-shadow:
+                0 18px 32px rgba(31, 41, 55, 0.9),
+                0 0 0 1px rgba(67, 56, 202, 0.6);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow:
+                0 8px 18px rgba(15, 23, 42, 0.9),
+                0 0 0 1px rgba(67, 56, 202, 0.8);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: wait;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.7);
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border-radius: 999px;
+            border: 2px solid rgba(209, 213, 219, 0.3);
+            border-top-color: #e5e7eb;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-card {
+            margin-top: 18px;
+            border-radius: 16px;
+            padding: 18px 18px 16px;
+            display: none;
+            background: radial-gradient(circle at top left, rgba(16, 185, 129, 0.18), rgba(6, 95, 70, 0.9));
+            border: 1px solid rgba(52, 211, 153, 0.6);
+            box-shadow:
+                0 18px 30px rgba(6, 78, 59, 0.9),
+                0 0 0 1px rgba(6, 95, 70, 0.7);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #bbf7d0;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #ecfdf5;
+        }
+
+        .result-sub {
+            font-size: 0.8rem;
+            color: #d1fae5;
+            margin-top: 4px;
+        }
+
+        .alert-inline {
+            font-size: 0.8rem;
+            padding: 8px 10px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .alert-error {
+            background: rgba(127, 29, 29, 0.9);
+            border: 1px solid rgba(248, 113, 113, 0.7);
+            color: #fee2e2;
+        }
+
+        .field-grid-separator {
+            margin: 12px 0 6px;
+            font-size: 0.8rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .card-glass {
+                padding: 20px 16px 18px;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <div class="card-glass">
+        <div class="page-header">
+            <div class="badge-chip">
+                <span class="badge-dot"></span>
+                Makine Öğrenmesi · Elmas Fiyat Tahmini
+            </div>
+            <h1 class="page-title">Diamond Price Estimator</h1>
+            <p class="page-subtitle">
+                Elmasın karat, kesim, renk, berraklık ve ölçülerine göre eğitilmiş makine öğrenmesi modelini kullanarak
+                yaklaşık piyasa fiyatını tahmin edin.
+            </p>
+        </div>
+
+        <hr class="divider">
+
+        <form id="predictionForm" novalidate>
+            <p class="section-title">Girdi Bilgileri</p>
+            <p class="helper-text mb-3">
+                Tüm alanları mümkün olduğunca doğru girin. Sayısal alanlarda nokta (`.`) kullanarak ondalık değer girebilirsiniz.
+            </p>
+
+            <div id="errorBox" class="alert-inline alert-error d-none" role="alert"></div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="carat" class="form-label">
+                        Karat
+                        <small>0.1 - 5 arası</small>
+                    </label>
+                    <input type="number" step="0.01" min="0.1" max="5" class="form-control" id="carat"
+                           placeholder="Örn: 1.25" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="cut" class="form-label">
+                        Kesim Kalitesi
+                    </label>
+                    <select class="form-select" id="cut" required>
+                        <option value="" selected disabled>Seçiniz</option>
+                        <option value="Fair">Fair</option>
+                        <option value="Good">Good</option>
+                        <option value="Very Good">Very Good</option>
+                        <option value="Premium">Premium</option>
+                        <option value="Ideal">Ideal</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="color" class="form-label">
+                        Renk
+                    </label>
+                    <select class="form-select" id="color" required>
+                        <option value="" selected disabled>Seçiniz</option>
+                        <option value="D">D (Renksiz)</option>
+                        <option value="E">E (Renksiz)</option>
+                        <option value="F">F (Renksiz)</option>
+                        <option value="G">G (Neredeyse Renksiz)</option>
+                        <option value="H">H (Neredeyse Renksiz)</option>
+                        <option value="I">I (Neredeyse Renksiz)</option>
+                        <option value="J">J (Neredeyse Renksiz)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-1">
+                <div class="col-md-4">
+                    <label for="clarity" class="form-label">
+                        Berraklık
+                    </label>
+                    <select class="form-select" id="clarity" required>
+                        <option value="" selected disabled>Seçiniz</option>
+                        <option value="I1">I1 (İncluded)</option>
+                        <option value="SI2">SI2 (Slightly Included)</option>
+                        <option value="SI1">SI1 (Slightly Included)</option>
+                        <option value="VS2">VS2 (Very Slightly Included)</option>
+                        <option value="VS1">VS1 (Very Slightly Included)</option>
+                        <option value="VVS2">VVS2 (Very Very Slightly Included)</option>
+                        <option value="VVS1">VVS1 (Very Very Slightly Included)</option>
+                        <option value="IF">IF (Internally Flawless)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="depth" class="form-label">
+                        Derinlik (%) <small>Genelde 55–70</small>
+                    </label>
+                    <input type="number" step="0.01" min="40" max="80" class="form-control" id="depth"
+                           placeholder="Örn: 61.5" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="table" class="form-label">
+                        Tabla (%) <small>Genelde 50–70</small>
+                    </label>
+                    <input type="number" step="0.01" min="40" max="80" class="form-control" id="table"
+                           placeholder="Örn: 57.0" required>
+                </div>
+            </div>
+
+            <p class="field-grid-separator">Fiziksel ölçüler (mm)</p>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="x" class="form-label">
+                        Uzunluk (X) <small>mm</small>
+                    </label>
+                    <input type="number" step="0.01" min="0" max="15" class="form-control" id="x"
+                           placeholder="Örn: 5.73" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="y" class="form-label">
+                        Genişlik (Y) <small>mm</small>
+                    </label>
+                    <input type="number" step="0.01" min="0" max="15" class="form-control" id="y"
+                           placeholder="Örn: 5.76" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="z" class="form-label">
+                        Derinlik (Z) <small>mm</small>
+                    </label>
+                    <input type="number" step="0.01" min="0" max="15" class="form-control" id="z"
+                           placeholder="Örn: 3.53" required>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between mt-4">
+                <p class="helper-text mb-2 mb-md-0">
+                    Bu sonuçlar, eğitilen modele göre yaklaşık tahmini fiyatları gösterir ve gerçek piyasa fiyatlarının
+                    yerini tutmaz.
+                </p>
+                <button type="submit" id="submitButton" class="btn btn-primary">
+                    <span class="btn-label-text">Tahmin Hesapla</span>
+                    <span class="d-none" id="btnSpinnerWrapper">
+                        <span class="btn-spinner"></span>
+                    </span>
+                </button>
+            </div>
+        </form>
+
+        <div id="resultCard" class="result-card mt-3">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+                <div>
+                    <div class="result-label">Tahmini Fiyat</div>
+                    <div id="predictedPrice" class="result-value">–</div>
+                    <div class="result-sub">
+                        USD cinsinden yaklaşık elmas fiyatı.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('predictionForm');
+    const errorBox = document.getElementById('errorBox');
+    const submitButton = document.getElementById('submitButton');
+    const btnSpinnerWrapper = document.getElementById('btnSpinnerWrapper');
+    const btnLabelText = submitButton.querySelector('.btn-label-text');
+    const resultCard = document.getElementById('resultCard');
+    const predictedPriceEl = document.getElementById('predictedPrice');
+
+    function setLoading(isLoading) {
+        submitButton.disabled = isLoading;
+        if (isLoading) {
+            btnLabelText.textContent = 'Hesaplanıyor...';
+            btnSpinnerWrapper.classList.remove('d-none');
+        } else {
+            btnLabelText.textContent = 'Tahmin Hesapla';
+            btnSpinnerWrapper.classList.add('d-none');
+        }
+    }
+
+    function showError(message) {
+        errorBox.textContent = message;
+        errorBox.classList.remove('d-none');
+    }
+
+    function clearError() {
+        errorBox.textContent = '';
+        errorBox.classList.add('d-none');
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+
+        const requiredFields = ['carat', 'cut', 'color', 'clarity', 'depth', 'table', 'x', 'y', 'z'];
+        for (const fieldId of requiredFields) {
+            const el = document.getElementById(fieldId);
+            if (!el.value) {
+                showError('Lütfen tüm alanları doldurun.');
+                el.focus();
+                return;
+            }
+        }
+
+        const formData = {
+            carat: parseFloat(document.getElementById('carat').value),
+            cut: document.getElementById('cut').value,
+            color: document.getElementById('color').value,
+            clarity: document.getElementById('clarity').value,
+            depth: parseFloat(document.getElementById('depth').value),
+            table: parseFloat(document.getElementById('table').value),
+            x: parseFloat(document.getElementById('x').value),
+            y: parseFloat(document.getElementById('y').value),
+            z: parseFloat(document.getElementById('z').value)
+        };
+
+        setLoading(true);
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const txt = await response.text();
+                throw new Error(txt || 'Sunucudan geçerli bir yanıt alınamadı.');
+            }
+
+            const data = await response.json();
+
+            if (data && typeof data.predicted_price !== 'undefined') {
+                const formatted = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 0
+                }).format(data.predicted_price);
+
+                predictedPriceEl.textContent = formatted;
+                resultCard.style.display = 'block';
+            } else {
+                throw new Error('Yanıt biçimi beklenen formatta değil.');
+            }
+        } catch (error) {
+            console.error('Prediction error:', error);
+            showError('Tahmin sırasında bir hata oluştu. Lütfen girdilerinizi kontrol edip tekrar deneyin.');
+        } finally {
+            setLoading(false);
+        }
+    });
+</script>
+</body>
+</html>
